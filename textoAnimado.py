@@ -1,4 +1,5 @@
 #Importa módulos para Interfaz Gráfica de usuario (tkinter)
+import threading
 import tkinter as tk
 from tkinter import ttk
 import time
@@ -32,14 +33,18 @@ def crearAnimacion(a, b, char):
         main_window.update()
 
 #Ejecuta tres animaciones
-crearAnimacion(10,10, 'X')
-crearAnimacion(10,30, 'Y')
-crearAnimacion(10,50, 'Z')
+animX=threading.Thread(target=crearAnimacion,args=(10, 10, 'X'))
+animY=threading.Thread(target=crearAnimacion,args=(10, 30, 'Y'))
+animZ=threading.Thread(target=crearAnimacion,args=(10, 50, 'Z'))
 
 
 # Mantener las siguientes líneas siempre al final del script y en el mismo orden.
 #Coloca la opcion "Salir"
-opcionFinalizar()
+btFinalizar=threading.Thread(target=opcionFinalizar)
 
+animX.start()
+animY.start()
+animZ.start()
+btFinalizar.start()
 #Bucle principal de la ventana
 main_window.mainloop()
