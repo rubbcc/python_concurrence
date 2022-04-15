@@ -1,4 +1,3 @@
- 
 #Importa módulos para Interfaz Gráfica de usuario (tkinter)
 import multiprocessing as mp
 import tkinter as tk
@@ -44,10 +43,11 @@ if __name__ == "__main__":
     animX = mp.Process(target=animarLinea, args=('X',q,))
     animY = mp.Process(target=animarLinea, args=('Y',q,))
     animZ = mp.Process(target=animarLinea, args=('Z',q,))
-    opcionFinalizar()
     animX.start()
     animY.start()
     animZ.start()
+    # Coloca la opcion "Salir"
+    opcionFinalizar()
     while(animX.is_alive() or animY.is_alive() or animZ.is_alive()):
         ret = q.get()
         if ret[0] == 'X':
@@ -56,10 +56,5 @@ if __name__ == "__main__":
             animar(ret[1], lblY)
         if ret[0] == 'Z':
             animar(ret[1], lblZ)
-
-
-# Mantener las siguientes líneas siempre al final del script y en el mismo orden.
-#Coloca la opcion "Salir"
-
-#Bucle principal de la ventana
-main_window.mainloop()
+    # Bucle principal de la ventana
+    main_window.mainloop()
