@@ -1,5 +1,6 @@
+ 
 #Importa módulos para Interfaz Gráfica de usuario (tkinter)
-import threading
+import multiprocessing as mp
 import tkinter as tk
 from tkinter import ttk
 import time
@@ -20,31 +21,45 @@ def createLabel(a,b):
     label.place(x=a,y=b)
     return label
 
-#Función que crea una etiqueta (llamando a createLabel()) y luego anima texto dentro de la misma.
-def crearAnimacion(a, b, char):
-    mylabel = createLabel(a,b)
-    texto=""
+def animarLinea(char,q):
+    texto = ""
     retardo: float=0.25
     for i in range(0,35):
         time.sleep(retardo)
         texto += char
-        mylabel.config(text = texto)
-        main_window.update_idletasks()
-        main_window.update()
+        q.put([char, texto])
+
+#Función que crea una etiqueta (llamando a createLabel()) y luego anima texto dentro de la misma.
+def animar(txt, lbl):
+    lbl.config(text = txt)
+    main_window.update_idletasks()
+    main_window.update()
 
 #Ejecuta tres animaciones
-animX=threading.Thread(target=crearAnimacion,args=(10, 10, 'X'))
-animY=threading.Thread(target=crearAnimacion,args=(10, 30, 'Y'))
-animZ=threading.Thread(target=crearAnimacion,args=(10, 50, 'Z'))
+if __name__ == "__main__":
+    q = mp.Queue()
+    lblX = createLabel(10,10)
+    lblY = createLabel(10,30)
+    lblZ = createLabel(10,50)
+    animX = mp.Process(target=animarLinea, args=('X',q,))
+    animY = mp.Process(target=animarLinea, args=('Y',q,))
+    animZ = mp.Process(target=animarLinea, args=('Z',q,))
+    opcionFinalizar()
+    animX.start()
+    animY.start()
+    animZ.start()
+    while(animX.is_alive() or animY.is_alive() or animZ.is_alive()):
+        ret = q.get()
+        if ret[0] == 'X':
+            animar(ret[1], lblX)
+        if ret[0] == 'Y':
+            animar(ret[1], lblY)
+        if ret[0] == 'Z':
+            animar(ret[1], lblZ)
 
 
 # Mantener las siguientes líneas siempre al final del script y en el mismo orden.
 #Coloca la opcion "Salir"
-btFinalizar=threading.Thread(target=opcionFinalizar)
 
-animX.start()
-animY.start()
-animZ.start()
-btFinalizar.start()
 #Bucle principal de la ventana
 main_window.mainloop()
